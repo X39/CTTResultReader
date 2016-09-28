@@ -45,7 +45,10 @@ namespace DLNA_TestResultReader
         //};
         protected override void OnStartup(StartupEventArgs e)
         {
-            using (var stream = System.IO.File.OpenRead("Strings.xaml"))
+
+            string stringsxaml = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase), "Strings.xaml");
+            stringsxaml = stringsxaml.Substring("file:\\\\".Length - 1);
+            using (var stream = System.IO.File.OpenRead(stringsxaml))
             {
                 ResourceDictionary rd = System.Windows.Markup.XamlReader.Load(stream) as ResourceDictionary;
                 Application.Current.Resources.MergedDictionaries.Add(rd);
