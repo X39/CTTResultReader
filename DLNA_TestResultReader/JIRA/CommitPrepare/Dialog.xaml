@@ -1,0 +1,126 @@
+﻿<!--
+MIT License
+
+Copyright (c) 2016 Marco Silipo (X39)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<Window x:Class="DLNA_TestResultReader.JIRA.CommitPrepare.Dialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DLNA_TestResultReader"
+        xmlns:util="clr-namespace:DLNA_TestResultReader.ResultFileUtil"
+        mc:Ignorable="d"
+        Icon="/DLNA_TestResultReader;component/ReaderLogoPath.ico"
+        Title="JiraCommitWindow" SizeToContent="WidthAndHeight" MinHeight="256" MinWidth="512">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <CheckBox x:Name="cb_SelectFailed" Content="Failed" Margin="5 0" Checked="cb_SelectFailed_Checked" Unchecked="cb_SelectFailed_Unchecked"/>
+                <CheckBox x:Name="cb_SelectWarning" Content="Warning" Margin="5 0" Checked="cb_SelectWarning_Checked" Unchecked="cb_SelectWarning_Unchecked"/>
+                <CheckBox x:Name="cb_SelectNotApplicable" Content="Not Applicable" Margin="5 0" Checked="cb_SelectNotApplicable_Checked" Unchecked="cb_SelectNotApplicable_Unchecked"/>
+            </StackPanel>
+            <ListBox x:Name="lb" Grid.Row="1" ItemsSource="{Binding TestCases}" SelectionMode="Multiple" DisplayMemberPath="Name" SelectionChanged="ListBox_SelectionChanged">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border BorderThickness="{TemplateBinding Border.BorderThickness}" Padding="{TemplateBinding Control.Padding}" BorderBrush="{TemplateBinding Border.BorderBrush}" Background="{TemplateBinding Panel.Background}" SnapsToDevicePixels="True">
+                                        <ContentPresenter/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Background" Value="Black"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Result}" Value="{x:Static util:EResult.Passed}">
+                                <Setter Property="Background" Value="Green"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Result}" Value="{x:Static util:EResult.Failed}">
+                                <Setter Property="Background" Value="Red"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Result}" Value="{x:Static util:EResult.NotApplicable}">
+                                <Setter Property="Background" Value="Gray"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Result}" Value="{x:Static util:EResult.Warning}">
+                                <Setter Property="Background" Value="DarkOrange"/>
+                            </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True"/>
+                                    <Condition Binding="{Binding Result}" Value="{x:Static util:EResult.Passed}"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="LightGreen"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True"/>
+                                    <Condition Binding="{Binding Result}" Value="{x:Static util:EResult.Failed}"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="#FFFFAAAA"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True"/>
+                                    <Condition Binding="{Binding Result}" Value="{x:Static util:EResult.NotApplicable}"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="LightGray"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True"/>
+                                    <Condition Binding="{Binding Result}" Value="{x:Static util:EResult.Warning}"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="Orange"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0" Text="{Binding ReportTemplate}"/>
+            <Button Grid.Row="1" Content="Commit" Command="{Binding cmd_jira_commit}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+        </Grid>
+    </Grid>
+</Window>

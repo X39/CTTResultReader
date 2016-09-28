@@ -1,0 +1,213 @@
+﻿<!--
+MIT License
+
+Copyright (c) 2016 Marco Silipo (X39)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<Window x:Class="DLNA_TestResultReader.ResultViewer.Dialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DLNA_TestResultReader.ResultViewer"
+        xmlns:util="clr-namespace:DLNA_TestResultReader.ResultFileUtil"
+        mc:Ignorable="d"
+        Icon="/DLNA_TestResultReader;component/ReaderLogoPath.ico"
+        Title="{Binding WindowTitle}" MinWidth="768" MinHeight="535">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top"/>
+        <Grid Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="4*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox Grid.Column="1" ItemsSource="{Binding AllTestRuns}" SelectedValue="{Binding SelectedTestRun}" DisplayMemberPath="Timestamp" SelectedIndex="0">
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="_Export" Command="{Binding cmd_export}"/>
+                                <MenuItem Header="_Report to JIRA" Command="{Binding cmd_jira_commit}"/>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                    </ListBox>
+                </Grid>
+                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
+                <ListBox Grid.Row="2" SelectionMode="Extended" ItemsSource="{Binding AllTestCases}" SelectedValue="{Binding SelectedTestCase}" DisplayMemberPath="Name" SelectedIndex="0">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border BorderThickness="{TemplateBinding Border.BorderThickness}" Padding="{TemplateBinding Control.Padding}" BorderBrush="{TemplateBinding Border.BorderBrush}" Background="{TemplateBinding Panel.Background}" SnapsToDevicePixels="True">
+                                            <ContentPresenter/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Background" Value="Black"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Result}" Value="{x:Static util:EResult.Passed}">
+                                    <Setter Property="Background" Value="Green"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Result}" Value="{x:Static util:EResult.Failed}">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Result}" Value="{x:Static util:EResult.NotApplicable}">
+                                    <Setter Property="Background" Value="Gray"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Result}" Value="{x:Static util:EResult.Warning}">
+                                    <Setter Property="Background" Value="DarkOrange"/>
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True"/>
+                                        <Condition Binding="{Binding Result}" Value="{x:Static util:EResult.Passed}"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="LightGreen"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True"/>
+                                        <Condition Binding="{Binding Result}" Value="{x:Static util:EResult.Failed}"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="#FFFFAAAA"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True"/>
+                                        <Condition Binding="{Binding Result}" Value="{x:Static util:EResult.NotApplicable}"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="LightGray"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True"/>
+                                        <Condition Binding="{Binding Result}" Value="{x:Static util:EResult.Warning}"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="Orange"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns"/>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock SnapsToDevicePixels="True" Grid.Column="0" Grid.Row="0" Padding="3 0" TextAlignment="Right" Text="Total Passed" Background="Green" Foreground="White"/>
+                    <TextBlock SnapsToDevicePixels="True" Grid.Column="1" Grid.Row="0" Padding="3 0" TextAlignment="Left" Text="{Binding SelectedTestRun.TotalPassed}" Background="Green" Foreground="White"/>
+                    <TextBlock SnapsToDevicePixels="True" Grid.Column="0" Grid.Row="1" Padding="3 0" TextAlignment="Right" Text="Total Failed" Background="Red" Foreground="White"/>
+                    <TextBlock SnapsToDevicePixels="True" Grid.Column="1" Grid.Row="1" Padding="3 0" TextAlignment="Left" Text="{Binding SelectedTestRun.TotalFailed}" Background="Red" Foreground="White"/>
+                    <TextBlock SnapsToDevicePixels="True" Grid.Column="0" Grid.Row="2" Padding="3 0" TextAlignment="Right" Text="Total NA" Background="Gray" Foreground="White"/>
+                    <TextBlock SnapsToDevicePixels="True" Grid.Column="1" Grid.Row="2" Padding="3 0" TextAlignment="Left" Text="{Binding SelectedTestRun.TotalNotApplicable}" Background="Gray" Foreground="White"/>
+                    <TextBlock SnapsToDevicePixels="True" Grid.Column="0" Grid.Row="3" Padding="3 0" TextAlignment="Right" Text="Total Warning" Background="Orange" Foreground="White"/>
+                    <TextBlock SnapsToDevicePixels="True" Grid.Column="1" Grid.Row="3" Padding="3 0" TextAlignment="Left" Text="{Binding SelectedTestRun.TotalWarning}" Background="Orange" Foreground="White"/>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="Title"/>
+                    <TextBlock Grid.Column="2" Grid.Row="0" Text="{Binding SelectedTestCase.Name}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="1" Text="Severity"/>
+                    <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding SelectedTestCase.Severity}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Note"/>
+                    <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding SelectedTestCase.ResultNote}"/>
+
+                    <TextBlock Grid.Column="0" Grid.Row="3" Text="Tool"/>
+                    <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding SelectedTestRun.TestTool}"/>
+                    
+                    <TextBlock Grid.Column="0" Grid.Row="4" Text="Device Class"/>
+                    <TextBlock Grid.Column="2" Grid.Row="4" Text="{Binding SelectedTestRun.DeviceClass}"/>
+                </Grid>
+                <Border Grid.Row="3">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="Black"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedTestCase.Result}" Value="{x:Static util:EResult.Passed}">
+                                    <Setter Property="Background" Value="Green"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding SelectedTestCase.Result}" Value="{x:Static util:EResult.Failed}">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding SelectedTestCase.Result}" Value="{x:Static util:EResult.NotApplicable}">
+                                    <Setter Property="Background" Value="Gray"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding SelectedTestCase.Result}" Value="{x:Static util:EResult.Warning}">
+                                    <Setter Property="Background" Value="Orange"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <TextBlock Text="{Binding SelectedTestCase.Result}" TextAlignment="Center" Foreground="White" FontSize="24"/>
+                </Border>
+                <TextBox Grid.Row="4" Text="{Binding SelectedTestCase.Log, Mode=OneWay}" IsReadOnly="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible"/>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>
